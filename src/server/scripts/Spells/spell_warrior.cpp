@@ -594,6 +594,44 @@ public:
     }
 };
 
+class spell_warr_rallying_cry : public SpellScriptLoader
+{
+public:
+    spell_warr_rallying_cry() : SpellScriptLoader("spell_warr_rallying_cry") { }
+
+    class spell_warr_rallying_cry_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_rallying_cry_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(97463))
+                return false;
+            return true;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                int32 healthModSpellBasePoints0 = int32(caster->CountPctFromMaxHealth(GetEffectValue()));
+                caster->CastCustomSpell(caster, 97463, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
+            }
+        }
+
+        void Register()
+        {
+            // add dummy effect spell handler to Rallying Cry
+            OnEffectHitTarget += SpellEffectFn(spell_warr_rallying_cry_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warr_rallying_cry_SpellScript();
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_last_stand();
@@ -610,4 +648,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_vigilance();
     new spell_warr_charge();
     new spell_warr_slam();
+    new spell_warr_rallying_cry();
 }
